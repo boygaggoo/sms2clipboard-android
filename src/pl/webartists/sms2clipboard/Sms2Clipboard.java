@@ -20,16 +20,35 @@
 package pl.webartists.sms2clipboard;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.content.Intent;
+import android.preference.PreferenceManager;
+
 import org.apache.cordova.*;
 
 public class Sms2Clipboard extends DroidGap
 {
+	
+	private SharedPreferences settings;
+	
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+    	super.onCreate(savedInstanceState);
         super.loadUrl("file:///android_asset/www/index.html");
+        
+        /* Register sms broadcast receiver */
+    	Context context = getContext();
+    	context.startService( new Intent(".Sms2ClipboardService"));
     }
+    
+    public void disableReceiver() {
+    	
+    }
+    
 }
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sms2clipboard>
+    <defaults name="startOnBoot" value="1"/>
+    <defaults name="markAsRead" value="1"/>
+</sms2clipboard>

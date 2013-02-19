@@ -22,5 +22,6 @@ public final class R {
     }
     public static final class xml {
         public static final int config=0x7f040000;
+        public static final int defaults=0x7f040001;
     }
 }
