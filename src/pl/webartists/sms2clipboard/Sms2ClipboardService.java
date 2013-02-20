@@ -22,6 +22,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.NetworkInfo.DetailedState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,26 +39,63 @@ import android.widget.Toast;
 public class Sms2ClipboardService extends Service {
 	
 	private SmsReceiver smsReceiver;
+	private NetworkChangeReceiver networkChangeReceiver;
 	private HashMap<String, ApiClient> apiClients;
+	
+	private Boolean isDiscovering = false;
+	private Boolean isSmsReceiverRegistred = false;
+	
+	
 	
 	@Override
 	public void onCreate() {
-		Log.i("S2C", "Service created");
+
 		super.onCreate();
-		IntentFilter intentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
-		Context context = getApplicationContext();
-		smsReceiver = new SmsReceiver();
+		
+		/* Register sms receiver */
+		ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if( networkInfo.isConnected() ) {
+			registerSmsReceiver();
+		}
+
+		/* Register wifi change receiver */
+		IntentFilter networkChangeIntentFilter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		networkChangeReceiver = new NetworkChangeReceiver();
+		registerReceiver(networkChangeReceiver, networkChangeIntentFilter);
+
+		/* Find servers and init apiClient (AES) */
 		apiClients = new HashMap<String, ApiClient>();
-		new findServerTask().execute();
-		context.registerReceiver(smsReceiver, intentFilter);
+		
+		if( !isDiscovering ) {
+			Log.i("S2C", "Run find server on service start....");
+			new FindServersTask().execute();
+		}
+			
+		
+	}
+	
+	private void registerSmsReceiver() {
+		if( isSmsReceiverRegistred == false ) {
+			isSmsReceiverRegistred = true;
+			IntentFilter smsReceriverIntentFilter = new IntentFilter("android.provider.Telephony.SMS_RECEIVED");
+			smsReceiver = new SmsReceiver();
+			registerReceiver(smsReceiver, smsReceriverIntentFilter);
+		}
+	}
+	
+	private void unregisterSmsReciver() {
+		if( isSmsReceiverRegistred )
+			unregisterReceiver(smsReceiver);
+		isSmsReceiverRegistred = false;
 	}
 	
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Context context = getApplicationContext();
-		context.unregisterReceiver(smsReceiver);
+		unregisterSmsReciver();
+		unregisterReceiver(networkChangeReceiver);
 	}
 	
 	@Override
@@ -67,9 +109,6 @@ public class Sms2ClipboardService extends Service {
 		
 	    public void onReceive(Context context, Intent intent)
 	    {
-	    	
-	    	new findServerTask().execute();
-	    	
 	        Bundle bundle = intent.getExtras();
 	        SmsMessage[] messages = null;
 	        
@@ -91,60 +130,84 @@ public class Sms2ClipboardService extends Service {
 	            	smsPacket.setText(messageBody);
 	            	smsPacket.setSource(messageSource);
 	            	smsPacket.setTimestamp(messageTimestamp);
-	            	new messageRecivedTask().execute(smsPacket);
+	            	new MessageRecivedTask().execute(smsPacket);
 	            }
 	        }
 	    }
-	    
-
-
-	    
+	}
+		
+	public class NetworkChangeReceiver extends BroadcastReceiver
+	{
+	    public void onReceive(Context context, Intent intent)
+	    {
+	    	try {
+	    		ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
+	    		NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	    		
+	    		if( networkInfo.isConnected() ) {
+	    			if( !isDiscovering )
+	    				new FindServersTask().execute();
+	    			registerSmsReceiver();
+	    		} else {
+	    			unregisterSmsReciver();
+	    		}
+	    	} catch( Exception e ) {
+	    		Log.e("S2C", "exception", e);
+	    	}
+	    }
 	}
 	
-    private class findServerTask extends AsyncTask<Object, Integer, Void> {
+	
+	
+    private class FindServersTask extends AsyncTask<Object, Integer, Void> {
     	@Override
     	protected Void doInBackground(Object... params) {
-    		Integer foundServersCount = 0;
-    		try {
-    			//Do discovery and make instance for missing apiClients.
-    			IAutoDiscoveryClient autoDiscoveryClient = new UDPAutoDiscoveryClient(0);
-    			List<ServerInstance>foundServers = autoDiscoveryClient.findServer();
-    			foundServersCount = foundServers.size();
-    			//We need this list to find apiClient instances that are no longer needed.
-    			ArrayList<String> foundServersKeys = new ArrayList<String>();
-    			
-    			
-    			for( int i = 0; i < foundServersCount; i++ ) {
-    				ServerInstance serverInstance = foundServers.get(i);
-    				String hashMapKey = serverInstance.getHostName() + serverInstance.getIp();
-    				foundServersKeys.add(hashMapKey);
-					if( !apiClients.containsKey( hashMapKey )) {
-						ApiClient newApiClient = new ApiClient(serverInstance.getIp(), 8080);
-						apiClients.put(hashMapKey, newApiClient );
-					}
-    			}
-    			
-    			
-    			//Removing unnecessary apiClient instances...	    			
-    			Set<String> hashMapKeys = apiClients.keySet();
-    			for(String hashMapKey : hashMapKeys ) {
-    				if( !foundServersKeys.contains(hashMapKey) ) {
-    					hashMapKeys.remove(hashMapKey);
-    				}
-    			}
-    		} catch( Exception exception) {
-    			Log.e("S2C", "exception", exception);
-    		}
-    		Log.i("S2C", "Found servers:" + foundServersCount);
+    		findServers();
     		return null;
     	}
     }
     
+    private void findServers() {
+    	isDiscovering = true;
+		Integer foundServersCount = 0;
+		try {
+			Log.i("S2C", "Starting discoverty!!!!!!!!!!");
+			//Do discovery and make instance for missing apiClients.
+			IAutoDiscoveryClient autoDiscoveryClient = new UDPAutoDiscoveryClient(1000);
+			List<ServerInstance>foundServers = autoDiscoveryClient.findServer();
+			foundServersCount = foundServers.size();
+			//We need this list to find apiClient instances that are no longer needed.
+			ArrayList<String> foundServersKeys = new ArrayList<String>();
+			
+			
+			for( ServerInstance serverInstance : foundServers ) {
+				String hashMapKey = serverInstance.getHostName() + serverInstance.getIp();
+				foundServersKeys.add(hashMapKey);
+				if( !apiClients.containsKey( hashMapKey )) {
+					ApiClient newApiClient = new ApiClient(serverInstance.getIp(), 8080);
+					apiClients.put(hashMapKey, newApiClient );
+				}
+			}
+			
+			
+			//Removing unnecessary apiClient instances...	    			
+			Set<String> hashMapKeys = apiClients.keySet();
+			for(String hashMapKey : hashMapKeys ) {
+				if( !foundServersKeys.contains(hashMapKey) ) {
+					hashMapKeys.remove(hashMapKey);
+				}
+			}
+		} catch( Exception exception) {
+			Log.e("S2C", "exception", exception);
+		}
+		Log.i("S2C", "Found servers:" + foundServersCount);
+		isDiscovering = false;
+    }
     
     
-    
-    private class messageRecivedTask extends findServerTask {
-		protected Void doInBackground(Object... smsPackets) {
+    private class MessageRecivedTask extends AsyncTask<SMSPacket, Integer, Void> {
+		protected Void doInBackground(SMSPacket... smsPackets) {
+			findServers();
 			try { 
 				
 				int count = smsPackets.length;
@@ -174,9 +237,8 @@ public class Sms2ClipboardService extends Service {
     }
     
     private void markMessageRead( String messegeSource, String messegeBody) {
-    	Context context = getApplicationContext();
         Uri uri = Uri.parse("content://sms/inbox");
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
         try {
         	while (cursor.moveToNext()) {
                 if ((cursor.getString(cursor.getColumnIndex("address")).equals(messegeSource)) && (cursor.getInt(cursor.getColumnIndex("read")) == 0)) {
@@ -184,7 +246,7 @@ public class Sms2ClipboardService extends Service {
                         String SmsMessageId = cursor.getString(cursor.getColumnIndex("_id"));
                         ContentValues values = new ContentValues();
                         values.put("read", true);
-                        context.getContentResolver().update(Uri.parse("content://sms/inbox"), values, "_id=" + SmsMessageId, null);
+                        getContentResolver().update(Uri.parse("content://sms/inbox"), values, "_id=" + SmsMessageId, null);
                         return;
                     }
                 }
