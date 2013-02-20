@@ -17,9 +17,12 @@ import pl.softace.sms2clipboard.net.autodiscovery.ServerInstance;
 import pl.softace.sms2clipboard.net.autodiscovery.impl.UDPAutoDiscoveryClient;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -72,8 +75,10 @@ public class Sms2ClipboardService extends Service {
 	        
 	        if (bundle != null)
 	        {
+	        	
 	            Object[] pdus = (Object[])bundle.get("pdus");
 	            messages = new SmsMessage[pdus.length];
+	            
 	            for (int i = 0; i < messages.length; i++)
 	            {
 	            	SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) pdus[i]); 
@@ -153,6 +158,8 @@ public class Sms2ClipboardService extends Service {
 						Packet pingResponse = apiClient.send(ping);
 						if (pingResponse != null && ((PingResponse) pingResponse).getStatus().equals(pl.softace.sms2clipboard.net.api.packet.enums.Status.OK)) {							
 							Packet smsConfirmation = apiClient.send(smsPacket);
+							Log.i("Mark as read", smsPacket.getSource() + ": " + smsPacket.getText() );
+							markMessageRead(smsPacket.getSource(), smsPacket.getText());
 						}
 						apiClient.disconnect();						
 					}
@@ -165,5 +172,26 @@ public class Sms2ClipboardService extends Service {
 	         return null;
 	     }
     }
+    
+    private void markMessageRead( String messegeSource, String messegeBody) {
+    	Context context = getApplicationContext();
+        Uri uri = Uri.parse("content://sms/inbox");
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        try {
+        	while (cursor.moveToNext()) {
+                if ((cursor.getString(cursor.getColumnIndex("address")).equals(messegeSource)) && (cursor.getInt(cursor.getColumnIndex("read")) == 0)) {
+                    if (cursor.getString(cursor.getColumnIndex("body")).startsWith(messegeBody)) {
+                        String SmsMessageId = cursor.getString(cursor.getColumnIndex("_id"));
+                        ContentValues values = new ContentValues();
+                        values.put("read", true);
+                        context.getContentResolver().update(Uri.parse("content://sms/inbox"), values, "_id=" + SmsMessageId, null);
+                        return;
+                    }
+                }
+            }
+        } catch(Exception e) {
+        	Log.e("Mark Read", "Error in Read: "+e.toString());
+        }
+}
 
 }
