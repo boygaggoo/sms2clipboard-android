@@ -192,9 +192,8 @@ public class Sms2ClipboardService extends Service {
 //				}
 //			}
 		} catch( Exception exception) {
-			Log.e("S2C", "exception", exception);
+			Log.e(TAG, "Discovery failed.", exception);
 		}
-		Log.i("S2C", "Found servers:" + foundServersCount);
 		isDiscovering = false;
     }
 	
