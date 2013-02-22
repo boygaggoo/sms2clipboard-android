@@ -68,6 +68,11 @@
       			<action android:name=".Sms2ClipboardService"/> 
    			</intent-filter>  
 		</service>
+		<receiver android:name=".BootReceiver">  
+		    <intent-filter>  
+		        <action android:name="android.intent.action.BOOT_COMPLETED" />  
+		    </intent-filter>  
+		</receiver>
     </application>
 
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="17"/>

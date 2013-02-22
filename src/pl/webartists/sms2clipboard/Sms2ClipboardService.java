@@ -81,6 +81,7 @@ public class Sms2ClipboardService extends Service {
 		super.onDestroy();
 		unregisterSmsReciver();
 		unregisterReceiver(networkChangeReceiver);
+		Log.i(TAG, "Service killed.");
 	}
 	
 	@Override

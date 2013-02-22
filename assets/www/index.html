@@ -20,19 +20,37 @@
 	<head>
 		<title>smsReciverService</title>
 		
-		<script type="text/javascript" charset="utf-8" src="cordova-2.2.0.js"></script>
-		
-        <script type="text/javascript" >
-  
-		
-
-		</script>
-		
+		<script type="text/javascript" charset="utf-8" src="libs/cordova-2.2.0.js"></script>
+		<script type="text/javascript" charset="utf-8" src="libs/quo.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/ServiceController.js"></script>
 	</head>
 	
 	<body>
 		<h1>smsReciverService</h1>
-		Nothing here.... yet :)
+		<button id="stopService">Stop Service</button>
+		<button id="startService">Start Service</button>
 		
+        <script type="text/javascript" >
+        
+        	$$(document).on("deviceready", function(){
+				$$("#stopService").on("tap", function(){
+					alert("Tapped");
+					serviceController.stopService( function() {
+						navigator.notification.alert("service stopped", function(){}, ":)", "OK");
+					});
+				});
+				
+				$$("#startService").on("tap", function(){
+					alert("Tapped");
+					serviceController.startService( function() {
+						navigator.notification.alert("service started", function(){}, ":)", "OK");
+					});
+				});
+				
+        	});		
+			
+			
+		</script>
+
 	</body>
 </html>
