@@ -28,6 +28,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.content.Intent;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.apache.cordova.*;
 
@@ -39,18 +40,6 @@ public class Sms2Clipboard extends DroidGap
     {
     	super.onCreate(savedInstanceState);
         super.loadUrl("file:///android_asset/www/index.html");
-        
-        SharedPreferences settings = getSharedPreferences("settings", MODE_PRIVATE);
-        Editor settingsEditor = settings.edit();
-        settingsEditor.putBoolean("startOnBoot", false);
-        settingsEditor.putString("myValue", "default value from DroidGap");
-        settingsEditor.commit();
-        
-        /* Register sms broadcast receiver */
-//    	Context context = getContext();
-//    	context.startService( new Intent(".Sms2ClipboardService"));
     }
-    
-    
 }
 

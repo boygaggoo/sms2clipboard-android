@@ -21,6 +21,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,6 +35,8 @@ import android.telephony.SmsMessage;
 import android.util.Log;
 
 public class Sms2ClipboardService extends Service {
+	
+	private SharedPreferences settings;
 	
 	/* Tag for logging */
 	private String TAG = this.getClass().getName();
@@ -48,8 +52,9 @@ public class Sms2ClipboardService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		settings = getSharedPreferences("settings", Context.MODE_PRIVATE);
 		try {
-			Log.v(TAG, "Starting Sms2Clipboard background service...");
+			Log.i(TAG, "Starting Sms2Clipboard background service...");
 			apiClients = new HashMap<String, ApiClient>();
 			
 			/* Register sms receiver if wifi is enabled and connected. */
@@ -69,7 +74,7 @@ public class Sms2ClipboardService extends Service {
 			if( !isDiscovering && networkInfo.isConnected() ) {
 				Log.i(TAG, "Looking for servers on service start...");
 				new FindServersTask().execute();
-			}			
+			}	
 		} catch ( Exception exception ) {
 			Log.e(TAG, "Failed to start Sms2Clipboard background service.", exception);
 		}
@@ -81,7 +86,7 @@ public class Sms2ClipboardService extends Service {
 		super.onDestroy();
 		unregisterSmsReciver();
 		unregisterReceiver(networkChangeReceiver);
-		Log.i(TAG, "Service killed.");
+		Log.i(TAG, "Service killed."); 
 	}
 	
 	@Override

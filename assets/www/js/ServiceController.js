@@ -10,8 +10,16 @@ var serviceController = function() {
 			cordova.exec( callback, errorHandler, "ServiceController", "startService", [] );
 		},
 		stopService: function( callback ) {
-			alert("Plugin - stopService...");
 			cordova.exec( callback, errorHandler, "ServiceController", "stopService", [] );
+			
+		},
+		isRunning: function( callback ) {
+		
+			function success(serviceState) {
+				callback(serviceState.serviceRunning);
+			}
+		
+			cordova.exec( success, errorHandler, "ServiceController", "isRunning", [] );
 		}
 	} 
 	

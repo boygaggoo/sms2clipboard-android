@@ -19,38 +19,50 @@
 <html>
 	<head>
 		<title>smsReciverService</title>
-		
-		<script type="text/javascript" charset="utf-8" src="libs/cordova-2.2.0.js"></script>
-		<script type="text/javascript" charset="utf-8" src="libs/quo.js"></script>
-		<script type="text/javascript" charset="utf-8" src="js/ServiceController.js"></script>
+		<link rel="stylesheet" href="css/reset.css" />
+		<link rel="stylesheet" href="css/font-awesome.min.css" />
+		<link rel="stylesheet" href="css/Sms2Clipboard.css" />
 	</head>
 	
 	<body>
-		<h1>smsReciverService</h1>
-		<button id="stopService">Stop Service</button>
-		<button id="startService">Start Service</button>
-		
-        <script type="text/javascript" >
-        
-        	$$(document).on("deviceready", function(){
-				$$("#stopService").on("tap", function(){
-					alert("Tapped");
-					serviceController.stopService( function() {
-						navigator.notification.alert("service stopped", function(){}, ":)", "OK");
-					});
-				});
-				
-				$$("#startService").on("tap", function(){
-					alert("Tapped");
-					serviceController.startService( function() {
-						navigator.notification.alert("service started", function(){}, ":)", "OK");
-					});
-				});
-				
-        	});		
-			
-			
-		</script>
+		<header>
+			<h1>sms2Clipboard</h1>
+		</header>
+		<section id="app-home" class="active">
 
+			<article>
+				<div id="app-toggle-container">
+					<div id="app-toggle-button" class="app-toggle-button-off"></div>
+					<div id="app-status">
+						<p>
+							SMS2CLIPBOARD is disabled<br />
+							Tap the switch to enable.
+						</p>
+					</div>
+				</div>
+			</article>
+		</section>
+		
+		<section id="app-servers">
+			<article>Servers....</article>
+		</section>
+		
+		<nav>
+			<ul>
+				<li data-section="app-home" class="current" ><i class="icon-home"></i><span class="nav-label">Home</span></li>
+				<li data-section="app-servers"><i class="icon-laptop"></i><span class="nav-label">Servers</span></li>
+				<li><i class="icon-question-sign"></i><span class="nav-label">Help</span></li>
+				<li><i class="icon-cog"></i><span class="nav-label">Settings</span></li>
+			</ul>
+		</nav>
+		<script type="text/javascript" charset="utf-8" src="libs/cordova-2.4.0.js"></script>
+		<script type="text/javascript" charset="utf-8" src="libs/quo.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/Lang.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/ServiceController.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/Settings.js"></script>
+        <script type="text/javascript" charset="utf-8" src="js/Sms2Clipboard.js"></script>
+		<script>
+			console.log(LANG);
+		</script>
 	</body>
 </html>
