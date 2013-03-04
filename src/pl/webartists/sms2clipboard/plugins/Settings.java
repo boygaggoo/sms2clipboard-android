@@ -50,7 +50,7 @@ public class Settings extends CordovaPlugin {
 			callbackContext.error( exception.getMessage() );
 		}
 	}
-	
+
 	private void setAll( CallbackContext callbackContext, JSONObject settingsJson ) {
 		Log.i(TAG, settingsJson.toString());
 		try {
@@ -61,15 +61,21 @@ public class Settings extends CordovaPlugin {
 				String key = (String)iterator.next();
 				Object value = settingsJson.get(key);
 				Log.i(TAG , "Settings update: " + key + " = " + value.toString());
+				Log.i(TAG, "isBoolean?");
 				if( value instanceof Boolean) {
+					Log.i(TAG, "yes it is boolean");
 					settingsEditor.putBoolean(key, (Boolean)value);
 				}
 				
+				Log.i(TAG, "isString?");
 				if( value instanceof String) {
+					Log.i(TAG, "yes it is string");
 					settingsEditor.putString(key, (String)value);
 				}
 				
+				Log.i(TAG, "isInt?");
 				if( value instanceof Integer) {
+					Log.i(TAG, "yes it is int");
 					settingsEditor.putInt(key, (Integer)value);
 				}
 

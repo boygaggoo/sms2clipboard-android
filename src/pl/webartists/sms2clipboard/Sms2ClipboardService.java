@@ -321,7 +321,10 @@ public class Sms2ClipboardService extends Service {
 							Log.v(TAG, "Server " + item.getKey() + " ping status OK. Send smsPacket.");
 							Packet smsConfirmation = apiClient.send(smsPacket);
 							Log.v(TAG, "smsPacket sent.");
-							markMessageRead(smsPacket.getSource(), smsPacket.getText());
+							if(settings.getBoolean("markAsRead", false)) {
+								markMessageRead(smsPacket.getSource(), smsPacket.getText());
+							}
+							
 						}
 						apiClient.disconnect();						
 					}

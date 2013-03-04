@@ -1,7 +1,6 @@
 body {
 	overflow: hidden;
 	background: #000;
-	
 }
 
 section {
@@ -9,6 +8,7 @@ section {
 	top: 50px;
 	left: 0;
 	right: 0;
+	overflow-y: auto;
 	bottom: 50px;
 	display: block;
 	opacity: 0;
@@ -54,7 +54,7 @@ nav {
 
 nav ul {
 	display: -webkit-box;
-	-webkit-box-pack: start  ;
+	-webkit-box-pack: start;
 	
 }
 nav li {
@@ -150,10 +150,49 @@ article {
 	 background-position: 0px -318px;
 }
 
-@media (orientation: portrait) {
+
+
+
+
+.list li {
+	
+	display: -webkit-box;
+	-webkit-box-pack: justify;
+	-webkit-box-shadow: 0px 0px 1px 1px rgba(50, 50, 50, 1);
+	background: rgb(60,60,60);
+}
+
+.list li:active {
 	
 }
 
-@media (orientation: landscape ) {	
+.list label {
+   	-webkit-box-align: center;
+	-webkit-box-flex: 1;
+	line-height: 2;
 	
+	
+}
+
+
+.switch {
+	width: 86px;
+	height: 52px;
+	background-image: url("../img/switch.png");
+}
+
+.switch-off {
+	background-position: -6px -84px;
+}
+
+.switch-off:active {
+	background-position: -6px -211px;
+}
+
+.switch-on {
+	background-position: -6px -27px;
+}
+
+.switch-on:active {
+	background-position: -6px -150px;
 }

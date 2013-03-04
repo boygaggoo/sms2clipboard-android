@@ -34,7 +34,6 @@ import org.apache.cordova.*;
 
 public class Sms2Clipboard extends DroidGap
 {
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

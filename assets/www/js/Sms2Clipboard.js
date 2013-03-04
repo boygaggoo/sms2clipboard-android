@@ -1,5 +1,5 @@
         	function init() {
-        		Settings.getAll( function() {
+        		Settings.getAll( function( settingsMap ) {
         			
         			
         			var $toggleButton = $$("#app-toggle-button"),
@@ -49,6 +49,34 @@
 	        			$$(this).addClass("current");
 	        			
 	        		});
+	        		
+	        		/* Settings */
+	        		$$.each(settingsMap, function(key, value) {
+	        			var $switch = $$(".switch[data-settings=" + key + "]");
+						if( typeof value == "boolean" ) {
+		        			$switch.data("value", value ? "1" : "0");
+		        			if( value ) {
+								$switch.removeClass("switch-off").addClass( "switch-on" )
+		        			}
+		        		}
+	        		});
+	        		
+	        		$$(".switch").tap( function(){
+	        			var $this = $$(this),
+	        				key = $this.data("settings"),
+	        				value = $this.data("value") == "1" ? false : true; 
+	        			
+	        			Settings.set(key, value, function(){
+	        				$this.data("value", value ? 1 : 0);
+							if( value ) {
+		        				$this.removeClass("switch-off").addClass("switch-on");
+		        			} else {
+	    	    				$this.removeClass("switch-on").addClass("switch-off");
+	        				} 	
+	        			});
+	        			
+	        			
+	        		}); 
         		        		
         		}); 
 

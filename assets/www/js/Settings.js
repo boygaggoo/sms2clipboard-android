@@ -29,13 +29,14 @@ var Settings = function() {
 			}
 		},
 		
-		set: function( key, value ) {
+		set: function( key, value, callback ) {
 		
 			function success( response ) {
-
 				settingsMap = response;
+				if( typeof callback == "function" ) {
+					callback();
+				} 
 			}
-		
 			settingsMap[key] = value;
 			cordova.exec( success, errorHandler, "Settings", "setAll", [settingsMap] );
 		} 

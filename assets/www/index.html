@@ -18,6 +18,7 @@
 -->
 <html>
 	<head>
+		<meta name="viewport" content="target-densitydpi=device-dpi; width=device-width; initial-scale=1; minimum-scale=1; maximum-scale=1; user-scalable=0;" />
 		<title>smsReciverService</title>
 		<link rel="stylesheet" href="css/reset.css" />
 		<link rel="stylesheet" href="css/font-awesome.min.css" />
@@ -28,7 +29,7 @@
 		<header>
 			<h1>sms2Clipboard</h1>
 		</header>
-		<section id="app-home" class="active">
+		<section id="app-home">
 
 			<article>
 				<div id="app-toggle-container">
@@ -43,6 +44,21 @@
 			</article>
 		</section>
 		
+		<section id="app-settings" class="active">
+			<article>
+				<ul class="list">
+					<li>
+						<label>Start on boot</label>
+						<div class="switch switch-off" data-settings="startOnBoot"></div>
+					</li>
+					<li>
+						<label>Mark messages as read</label>
+						<div class="switch switch-off" data-settings="markAsRead"></div>
+					</li>
+				</ul>
+			</article>
+		</section>
+		
 		<section id="app-servers">
 			<article>Servers....</article>
 		</section>
@@ -52,7 +68,7 @@
 				<li data-section="app-home" class="current" ><i class="icon-home"></i><span class="nav-label">Home</span></li>
 				<li data-section="app-servers"><i class="icon-laptop"></i><span class="nav-label">Servers</span></li>
 				<li><i class="icon-question-sign"></i><span class="nav-label">Help</span></li>
-				<li><i class="icon-cog"></i><span class="nav-label">Settings</span></li>
+				<li data-section="app-settings"><i class="icon-cog"></i><span class="nav-label">Settings</span></li>
 			</ul>
 		</nav>
 		<script type="text/javascript" charset="utf-8" src="libs/cordova-2.4.0.js"></script>
