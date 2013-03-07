@@ -9,7 +9,7 @@ var Settings = function() {
 
 	return {
 		getAll: function( callback ) {
-			
+			dialog.show();
 			function success( response ) {
 				settingsMap = response;
 				settingsLoaded = true;

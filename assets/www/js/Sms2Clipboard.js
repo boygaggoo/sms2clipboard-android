@@ -61,11 +61,10 @@
 		        		}
 	        		});
 	        		
-	        		$$(".switch").tap( function(){
+	        		$$(".switch").on( "tap", function(){
 	        			var $this = $$(this),
 	        				key = $this.data("settings"),
 	        				value = $this.data("value") == "1" ? false : true; 
-	        			
 	        			Settings.set(key, value, function(){
 	        				$this.data("value", value ? 1 : 0);
 							if( value ) {
@@ -74,16 +73,19 @@
 	    	    				$this.removeClass("switch-on").addClass("switch-off");
 	        				} 	
 	        			});
-	        			
-	        			
 	        		}); 
+	        		
+	        		$$("#settings-test-message").on("tap", function(){
+	        			dialog.show({
+	        				title: "Test messege",
+	        				content: "Sending test message..."
+	        			});
+	        		});
         		        		
         		}); 
-
         	}
         	
         	//$$(document).ready(init);
         	$$(document).on("deviceready", function(){
 				init();
         	});
-        	

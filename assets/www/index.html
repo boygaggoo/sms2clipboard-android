@@ -29,7 +29,7 @@
 		<header>
 			<h1>sms2Clipboard</h1>
 		</header>
-		<section id="app-home">
+		<section id="app-home" class="active">
 
 			<article>
 				<div id="app-toggle-container">
@@ -44,7 +44,7 @@
 			</article>
 		</section>
 		
-		<section id="app-settings" class="active">
+		<section id="app-settings">
 			<article>
 				<ul class="list">
 					<li>
@@ -54,6 +54,10 @@
 					<li>
 						<label>Mark messages as read</label>
 						<div class="switch switch-off" data-settings="markAsRead"></div>
+					</li>
+					<li id="settings-test-message">
+						<label>Send test message</label>
+						<i class="icon-angle-right"></i>
 					</li>
 				</ul>
 			</article>
@@ -76,6 +80,7 @@
 		<script type="text/javascript" charset="utf-8" src="js/Lang.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/ServiceController.js"></script>
 		<script type="text/javascript" charset="utf-8" src="js/Settings.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/Dialog.js"></script>
         <script type="text/javascript" charset="utf-8" src="js/Sms2Clipboard.js"></script>
 		<script>
 			console.log(LANG);
